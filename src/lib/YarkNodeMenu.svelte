@@ -334,25 +334,27 @@
 				/>
 			</div>
 			<div class="ms-auto hstack gap-2">
-				{#if avatar.img !== 'unknown'}
-					<div
-						class="togglepin "
-						on:mouseenter={() => {
-							overflag['top-avatar'] = true;
-						}}
-						on:mouseleave={() => {
-							overflag['top-avatar'] = false;
-						}}
-					>
-						<img
-							src={avatar.img}
-							class={(avatar.class ?? 'avatar32') +
-								' ' +
-								(overflag['top-avatar'] ? 'avatar-over' : '')}
-							alt="avatar"
-						/>
-					</div>
-				{/if}
+				<slot name="me">
+					{#if avatar.img !== 'unknown'}
+						<div
+							class="togglepin "
+							on:mouseenter={() => {
+								overflag['top-avatar'] = true;
+							}}
+							on:mouseleave={() => {
+								overflag['top-avatar'] = false;
+							}}
+						>
+							<img
+								src={avatar.img}
+								class={(avatar.class ?? 'avatar32') +
+									' ' +
+									(overflag['top-avatar'] ? 'avatar-over' : '')}
+								alt="avatar"
+							/>
+						</div>
+					{/if}
+				</slot>
 				<div
 					class="togglepin"
 					on:mouseenter={() => {
