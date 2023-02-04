@@ -191,8 +191,8 @@
 	menuDef={testMenuDef}
 	{dict}
 	{isMobile}
-	avatar={{ img: 'https://picsum.photos/id/237/32/32' }}
-	logo={{ img: 'https://picsum.photos/id/238/32/32' }}
+	avatar={{ img: '/avatar.png' }}
+	logo={{ img: '/yarknode_logo.png' }}
 	on:changeWorklistStatus={changeWorklistStatus}
 />
 

@@ -22,7 +22,7 @@
 	export let menuDef: menuDataType[] = [{ id: 'Welcome' }];
 	export let isMobile: boolean = false;
 	export let avatar: any = { img: 'unknown' };
-	export let logo: any = { img: 'https://picsum.photos/id/238/32/32' };
+	export let logo: any = { img: '/yarknode_logo.png' };
 	export let dict: Record<string, string> = {};
 
 	$menuData = menuDef;
@@ -517,5 +517,9 @@
 	.logo-over {
 		border: inset;
 		border-color: var(--bs-primary);
+	}
+	.tnt-logo-img {
+		width: 32px;
+		height: 32px;
 	}
 </style>
