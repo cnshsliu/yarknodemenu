@@ -262,7 +262,7 @@
 	};
 
 	export const refreshMenu = () => {
-		console.log('In refresh menu');
+		console.log('In refresh menu', menuDef);
 		switch (dataMode) {
 			case 'static':
 				break;
@@ -282,6 +282,7 @@
 			});
 		}
 		menuItems = menuItems;
+		console.log('In refresh menu', menuItems);
 	};
 
 	onMount(async () => {
