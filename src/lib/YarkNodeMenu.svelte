@@ -286,6 +286,7 @@
 
 	onMount(async () => {
 		refreshMenu();
+		dispatch('menuMounted');
 	});
 
 	// 在整个应用中,如果需要重新刷新菜单,只需要将$menuRefreshFlag = true,  即可
