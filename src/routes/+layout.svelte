@@ -11,11 +11,50 @@
 		menuMode,
 		menuData,
 		menuDataInitial,
+		currentBiz,
 		demoData
 	} from '$lib/MenuData';
 	import type { menuItemType, menuDataType, menuOperationType } from '$lib/MenuData';
 
 	$menuInSession = $page.data.user ? true : false;
+	let theMenu;
+
+	const example_saveOneBiz = function (tplid: string) {
+		if (tplid === null || tplid === undefined || tplid === '') return;
+		if (!localStorage) return;
+
+		let rcts = JSON.parse(localStorage.getItem('recentTemplates') ?? JSON.stringify([]));
+		let old_rcts = [...rcts];
+		let tmp = rcts.indexOf(tplid);
+		if (tmp === 0) return; //如果已经是第一项,则直接返回,不用处理
+
+		if (tmp >= 0) {
+			//如果找到, 就在原位置删除
+			rcts.splice(tmp, 1);
+		}
+
+		rcts.unshift(tplid); //在头部加入
+		if (rcts.length > 10) {
+			//如多余10个,则限制在10个
+			rcts.splice(10);
+		}
+		console.log('Save on BIZ  -------->', tplid, old_rcts, rcts);
+		localStorage.setItem('recentTemplates', JSON.stringify(rcts));
+		let tmpData: menuDataType[] = [];
+		for (let i = 0; i < rcts.length; i++) {
+			tmpData.push({
+				id: `__recentbiz_${rcts[i]}`,
+				class: 'recent_biz',
+				alias: rcts[i],
+				href: `/biz/${rcts[i]}`,
+				icon: 'dot'
+			});
+		}
+
+		theMenu.replaceChildren('___recentbiz', tmpData);
+	};
+
+	$: example_saveOneBiz($currentBiz);
 
 	function getBootstrapBreakpoint(w: number) {
 		const ret = w < 576 ? 0 : w < 768 ? 1 : w < 992 ? 2 : w < 1200 ? 3 : w < 1400 ? 4 : 5;
@@ -121,6 +160,7 @@
 		{
 			id: '___recentbiz',
 			class: 'part3',
+			href: '/biz',
 			alias: 'Recents',
 			icon: 'calendar-heart'
 		},
@@ -188,6 +228,7 @@
 </svelte:head>
 
 <YarkNodeMenu
+	bind:this={theMenu}
 	menuDef={testMenuDef}
 	{dict}
 	{isMobile}

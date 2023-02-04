@@ -48,4 +48,5 @@ export const menuDataInitial = writable([] as Partial<menuItemType>[]);
 export const menuDataForSetting = writable([] as Partial<menuItemType>[]);
 export const menuDataFromServer = writable([] as Partial<menuItemType>[]);
 export const menuExtra = writable([] as Partial<menuItemType>[]);
+export const currentBiz = writable('');
 export const demoData = writable({});

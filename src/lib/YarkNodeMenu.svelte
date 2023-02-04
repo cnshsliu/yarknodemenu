@@ -240,6 +240,37 @@
 			}, 1);
 		})();
 
+	export const replaceChildren = (theID: string, children: menuDataType[]) => {
+		let rbIndex = menuItems.map((mi) => mi.id).indexOf(theID);
+		if (rbIndex >= 0) {
+			let rb = menuItems[rbIndex];
+			let oldChildren = menuItems.filter((mi) => {
+				return mi.folder === rb.folder + rb.id + '/';
+			});
+			let oldChildrenCount = oldChildren.length;
+			menuItems[rbIndex].hasSub = false;
+			const newChildrenDataDef = [
+				{
+					id: menuItems[rbIndex].id,
+					class: menuItems[rbIndex].class,
+					alias: menuItems[rbIndex].alias,
+					icon: menuItems[rbIndex].icon,
+					sub: children
+				}
+			];
+			let tmpItems: menuItemType[] = [];
+			parseDataToItems(
+				tmpItems,
+				newChildrenDataDef,
+				menuItems[rbIndex].level,
+				menuItems[rbIndex].folder + menuItems[rbIndex].id
+			);
+			tmpItems[0].display = true;
+			menuItems.splice(rbIndex, oldChildrenCount + 1, ...tmpItems);
+			menuItems = menuItems;
+		}
+	};
+
 	export const refreshMenu = async () => {
 		switch (dataMode) {
 			case 'static':
