@@ -71,7 +71,7 @@
 		goto(`/work`);
 	};
 
-	const testMenuDef: menuDataType[] = [
+	const menuDef: menuDataType[] = [
 		{
 			id: '_worklist',
 			class: 'part1',
@@ -190,7 +190,7 @@
 		}
 	];
 
-	$menuDataInitial = testMenuDef;
+	$menuDataInitial = menuDef;
 
 	let isMobile: boolean = false;
 
@@ -229,7 +229,7 @@
 
 <YarkNodeMenu
 	bind:this={theMenu}
-	menuDef={testMenuDef}
+	{menuDef}
 	{dict}
 	{isMobile}
 	avatar={{ img: '/avatar.png' }}
@@ -237,6 +237,16 @@
 	on:changeWorklistStatus={changeWorklistStatus}
 />
 
+<button
+	class="btn btn-primary"
+	on:click={() => {
+		console.log('Refresh menu...');
+		menuDef.splice(0, 1);
+		theMenu.refreshMenu();
+	}}
+>
+	Reload
+</button>
 <div class="p-0 {isMobile ? '' : $menuPinned ? 'ms-kfk-200' : 'ms-kfk-5'}">
 	<slot />
 </div>

@@ -230,16 +230,6 @@
 		return label;
 	};
 
-	// 在整个应用中,如果需要重新刷新菜单,只需要将$menuRefreshFlag = true,  即可
-	$: $menuRefreshFlag &&
-		(() => {
-			setTimeout(() => {
-				refreshMenu().then(() => {
-					$menuRefreshFlag = false;
-				});
-			}, 1);
-		})();
-
 	export const replaceChildren = (theID: string, children: menuDataType[]) => {
 		let rbIndex = menuItems.map((mi) => mi.id).indexOf(theID);
 		if (rbIndex >= 0) {
@@ -272,6 +262,7 @@
 	};
 
 	export const refreshMenu = async () => {
+		console.log('In refresh menu');
 		switch (dataMode) {
 			case 'static':
 				break;
@@ -280,7 +271,7 @@
 				break;
 		}
 		menuItems.length = 0;
-		parseDataToItems(menuItems, $menuData, 0, '/');
+		parseDataToItems(menuItems, menuDef, 0, '/');
 		expandFolder('/');
 
 		if (dataMode === 'editing') {
@@ -296,6 +287,15 @@
 	onMount(async () => {
 		await refreshMenu();
 	});
+
+	// 在整个应用中,如果需要重新刷新菜单,只需要将$menuRefreshFlag = true,  即可
+	$: $menuRefreshFlag &&
+		(() => {
+			console.log('RefreshFlag', $menuRefreshFlag);
+			refreshMenu().then(() => {
+				$menuRefreshFlag = false;
+			});
+		})();
 </script>
 
 <!-- svelte-ignore missing-declaration -->
