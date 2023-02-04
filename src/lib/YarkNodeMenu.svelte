@@ -261,7 +261,7 @@
 		}
 	};
 
-	export const refreshMenu = async () => {
+	export const refreshMenu = () => {
 		console.log('In refresh menu');
 		switch (dataMode) {
 			case 'static':
@@ -285,16 +285,15 @@
 	};
 
 	onMount(async () => {
-		await refreshMenu();
+		refreshMenu();
 	});
 
 	// 在整个应用中,如果需要重新刷新菜单,只需要将$menuRefreshFlag = true,  即可
 	$: $menuRefreshFlag &&
 		(() => {
 			console.log('RefreshFlag', $menuRefreshFlag);
-			refreshMenu().then(() => {
-				$menuRefreshFlag = false;
-			});
+			refreshMenu();
+			$menuRefreshFlag = false;
 		})();
 </script>
 
