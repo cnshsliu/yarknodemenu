@@ -6,7 +6,6 @@
 	import {
 		menuMode,
 		menuMobile,
-		menuData,
 		menuInSession,
 		menuDataInitial,
 		menuDataForSetting,
@@ -25,7 +24,6 @@
 	export let logo: any = { img: '/yarknode_logo.png' };
 	export let dict: Record<string, string> = {};
 
-	$menuData = menuDef;
 	$menuMobile = isMobile;
 
 	const dispatch = createEventDispatcher();
@@ -261,13 +259,14 @@
 		}
 	};
 
-	export const refreshMenu = () => {
+	export const refreshMenu = (newMenuDef: menuDataType[] | undefined = undefined) => {
+		if (newMenuDef) menuDef = newMenuDef;
 		console.log('In refresh menu 2', menuDef);
 		switch (dataMode) {
 			case 'static':
 				break;
 			case 'editting':
-				$menuData = $menuDataForSetting;
+				menuDef = $menuDataForSetting as menuDataType[];
 				break;
 		}
 		menuItems.length = 0;
@@ -289,14 +288,6 @@
 		refreshMenu();
 		dispatch('menuMounted');
 	});
-
-	// 在整个应用中,如果需要重新刷新菜单,只需要将$menuRefreshFlag = true,  即可
-	$: $menuRefreshFlag &&
-		(() => {
-			console.log('RefreshFlag', $menuRefreshFlag);
-			refreshMenu();
-			$menuRefreshFlag = false;
-		})();
 </script>
 
 <!-- svelte-ignore missing-declaration -->
