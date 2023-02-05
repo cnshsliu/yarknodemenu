@@ -237,16 +237,6 @@
 	on:changeWorklistStatus={changeWorklistStatus}
 />
 
-<button
-	class="btn btn-primary"
-	on:click={() => {
-		console.log('Refresh menu...');
-		menuDef.splice(0, 1);
-		theMenu.refreshMenu();
-	}}
->
-	Reload
-</button>
 <div class="p-0 {isMobile ? '' : $menuPinned ? 'ms-kfk-200' : 'ms-kfk-5'}">
 	<slot />
 </div>
