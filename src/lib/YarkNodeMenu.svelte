@@ -216,12 +216,7 @@
 	const getLabel = (item: menuItemType): string => {
 		let label = item.id;
 		if (item.alias) {
-			if (item.alias.startsWith('$')) {
-				label = item.alias.slice(1);
-				label = dict[label] ?? label;
-			} else {
-				label = item.alias;
-			}
+			label = item.alias;
 		} else {
 			label = item.id;
 		}
@@ -257,6 +252,15 @@
 			menuItems.splice(rbIndex, oldChildrenCount + 1, ...tmpItems);
 			menuItems = menuItems;
 		}
+	};
+
+	export const translate = (fn) => {
+		for (let i = 0; i < menuItems.length; i++) {
+			if (menuItems[i].alias) {
+				menuItems[i].alias = fn(menuItems[i].alias);
+			}
+		}
+		menuItems = menuItems;
 	};
 
 	export const refreshMenu = (newMenuDef: menuDataType[] | undefined = undefined) => {
