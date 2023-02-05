@@ -256,9 +256,10 @@
 
 	export const translate = (fn) => {
 		for (let i = 0; i < menuItems.length; i++) {
-			if (menuItems[i].alias) {
-				menuItems[i].alias = fn(menuItems[i].alias);
-			}
+			let tmp = menuItems[i].alias;
+			if (!tmp) continue;
+			if (tmp.charAt(0) !== '$') continue;
+			menuItems[i].alias = fn(tmp.slice(1));
 		}
 		menuItems = menuItems;
 	};
