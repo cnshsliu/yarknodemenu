@@ -13,4 +13,8 @@
 
 <div class="fs-3 text-center">Business admin</div>
 
-<button class="btn btn-primary" on:click={addRandomBizId}>demo:Add one biz</button>
+<div class="text-center">
+	<button class="btn btn-primary" on:click={addRandomBizId}>demo:Add one biz</button>
+
+	<div>See submenus under "Recents"</div>
+</div>

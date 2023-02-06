@@ -6,4 +6,4 @@
 	$: ({ action } = data);
 </script>
 
-<div class="text-center fs-3">action: {action}</div>
+<div class="text-center fs-3">Workflow action: {action}</div>

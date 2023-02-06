@@ -2,22 +2,18 @@
 	import YarkNodeMenu from '$lib/YarkNodeMenu.svelte';
 	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
-	import { goto, invalidateAll } from '$app/navigation';
-	import { writable } from 'svelte/store';
-	import {
-		menuMobile,
-		menuPinned,
-		menuInSession,
-		menuMode,
-		menuData,
-		menuDataInitial,
-		currentBiz,
-		demoData
-	} from '$lib/MenuData';
-	import type { menuItemType, menuDataType, menuOperationType } from '$lib/MenuData';
+	import { goto } from '$app/navigation';
+	import { menuInSession, currentBiz, demoData } from '$lib/MenuData';
+	import type { menuDataType } from '$lib/MenuData';
+	import { Toast } from 'bootstrap';
 
+	let theMenu: any;
 	$menuInSession = $page.data.user ? true : false;
-	let theMenu;
+
+	let isMobile: boolean = false;
+	let menuStyle: string = 'browser';
+	let mainAreaClass: string = 'main-area-width-small';
+	let notify = { message: '' };
 
 	const example_saveOneBiz = function (tplid: string) {
 		if (tplid === null || tplid === undefined || tplid === '') return;
@@ -58,17 +54,53 @@
 
 	function getBootstrapBreakpoint(w: number) {
 		const ret = w < 576 ? 0 : w < 768 ? 1 : w < 992 ? 2 : w < 1200 ? 3 : w < 1400 ? 4 : 5;
-		console.log('Get bootstrape breakpoint', ret);
+		console.log('Get bootstrap breakpoint', ret);
 		return ret;
 	}
 
-	const changeWorklistStatus = async (event: CustomEvent) => {
+	const onChangeWorklistStatus = async (event: CustomEvent) => {
 		const payload = event.detail;
 		if (payload === undefined) return;
 
 		$demoData = payload;
 		console.log($demoData);
 		goto(`/work`);
+	};
+
+	const onSizeChanged = async (event: CustomEvent) => {
+		const payload = event.detail;
+		if (payload === undefined) return;
+		console.log(payload);
+		if (menuStyle === 'mobile') return '';
+		switch (payload.to) {
+			case 'float-logo':
+			case 'float-small':
+				mainAreaClass = 'main-area-width-small';
+				break;
+			case 'float-big':
+				mainAreaClass = 'main-area-width-big';
+				break;
+		}
+	};
+
+	const onChangeStyle = async (event: CustomEvent) => {
+		const payload = event.detail;
+		if (payload === undefined) return;
+		console.log(payload);
+		menuStyle = payload.style;
+		notify.message = `Style changed to ${menuStyle}`;
+		const toast = new Toast(document.getElementById('liveToast') as Element);
+		toast.show();
+	};
+
+	const checkValue = (what: string, expect: any) => {
+		let ret = false;
+		switch (what) {
+			case 'inSession':
+				ret = $menuInSession === expect;
+				break;
+		}
+		return ret;
 	};
 
 	const menuDef: menuDataType[] = [
@@ -106,8 +138,26 @@
 			img: 'https://picsum.photos/16/16',
 			sub: [
 				{ id: '_template_create', alias: 'Create', href: '/template/create' },
-				{ id: '_template_import', alias: 'Import', href: '/template/import' },
-				{ id: '_template_search', alias: 'Search', href: '/template/search' }
+				{
+					id: '_template_import',
+					alias: 'Import',
+					href: '/template/import',
+					sub: [
+						{ id: '_template_create', alias: 'Create', href: '/template/create' },
+						{ id: '_template_import', alias: 'Import', href: '/template/import' },
+						{ id: '_template_search', alias: 'Search', href: '/template/search' }
+					]
+				},
+				{
+					id: '_template_search',
+					alias: 'Search',
+					href: '/template/search',
+					sub: [
+						{ id: '_template_create', alias: 'Create', href: '/template/create' },
+						{ id: '_template_import', alias: 'Import', href: '/template/import' },
+						{ id: '_template_search', alias: 'Search', href: '/template/search' }
+					]
+				}
 			]
 		},
 		{
@@ -170,15 +220,7 @@
 			alias: 'Signin',
 			icon: 'door-open',
 			href: '/login',
-			insession: -1
-		},
-		{
-			id: '____ME',
-			class: 'me',
-			alias: '$mydn',
-			icon: 'people',
-			href: '/profile',
-			insession: 1
+			check_visible: { fn: checkValue, what: 'inSession', expect: false }
 		},
 		{
 			id: '____signout',
@@ -186,20 +228,43 @@
 			alias: 'Signout',
 			icon: 'door-closed-fill',
 			href: '/logout',
-			insession: 1
+			check_visible: { fn: checkValue, what: 'inSession', expect: true }
+		},
+		{
+			id: '____demostye',
+			alias: 'Menu Style',
+			icon: 'flower',
+			sub: [
+				{
+					id: '__ds_browser',
+					alias: 'Browser',
+					callback: 'changeStyle',
+					payload: { style: 'browser' }
+				},
+				{
+					id: '__ds_browser',
+					alias: 'PC',
+					callback: 'changeStyle',
+					payload: { style: 'pc' }
+				},
+				{
+					id: '__ds_browser',
+					alias: 'Mobile',
+					callback: 'changeStyle',
+					payload: { style: 'mobile' }
+				},
+				{
+					id: '__ds_browser',
+					alias: 'Windows',
+					callback: 'changeStyle',
+					payload: { style: 'windows' }
+				}
+			]
 		}
 	];
 
-	$menuDataInitial = menuDef;
-
-	let isMobile: boolean = false;
-
-	const dict: Record<string, string> = {
-		mydn: 'Lucas',
-		help: 'HELP' //may put i18n localization here
-	};
-
 	onMount(() => {
+		console.log(navigator?.userAgent);
 		isMobile = navigator
 			? navigator.userAgent.match(/Android/i) ||
 			  navigator.userAgent.match(/webOS/i) ||
@@ -211,11 +276,20 @@
 				? true
 				: false
 			: false;
+
+		if (isMobile) {
+			menuStyle = 'mobile';
+		} else {
+			menuStyle = 'browser';
+		}
+
+		if (menuStyle === 'mobile') mainAreaClass = '';
 	});
+
+	$: $menuInSession + theMenu?.tickMenu();
 </script>
 
 <svelte:head>
-	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js"></script>
 	<link
 		rel="stylesheet"
 		href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css"
@@ -230,22 +304,36 @@
 <YarkNodeMenu
 	bind:this={theMenu}
 	{menuDef}
-	{dict}
-	{isMobile}
+	{menuStyle}
 	avatar={{ img: '/avatar.png' }}
-	logo={{ img: '/yarknode_logo.png' }}
-	on:changeWorklistStatus={changeWorklistStatus}
+	logo={{ img: '/yn.png' }}
+	on:changeWorklistStatus={onChangeWorklistStatus}
+	on:sizeChanged={onSizeChanged}
+	on:changeStyle={onChangeStyle}
 />
 
-<div class="p-0 {isMobile ? '' : $menuPinned ? 'ms-kfk-200' : 'ms-kfk-5'}">
-	<slot />
+<div class="p-0 {mainAreaClass}  w-100 h-100">
+	<div class="top-50 start-50 translate-middle text-center" style="position:absolute;">
+		<div><img src="/yn.png" alt="yn" style="width:32px; " /></div>
+		<div><slot /></div>
+	</div>
+</div>
+<div class="toast-container position-fixed top-0 end-0 p-3">
+	<div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+		<div class="toast-header">
+			<img src="/block.svg" class="rounded me-2" alt="..." />
+			<strong class="me-auto">Yarknode Menu</strong>
+			<button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close" />
+		</div>
+		<div class="toast-body">{notify.message}</div>
+	</div>
 </div>
 
 <style>
-	.ms-kfk-200 {
+	.main-area-width-big {
 		margin-left: 200px;
 	}
-	.ms-kfk-5 {
+	.main-area-width-small {
 		margin-left: 55px;
 	}
 </style>

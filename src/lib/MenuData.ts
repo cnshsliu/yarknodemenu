@@ -14,7 +14,15 @@ export type menuItemType = {
 	target?: string;
 	parent?: menuDataType;
 	sub?: Partial<menuItemType>[];
-	insession?: number;
+	visible?: boolean;
+	check_visible?: {
+		fn: (
+			what: string,
+			expect: boolean | string | number | undefined | null | ArrayLike<boolean | string | number>
+		) => boolean;
+		what: string;
+		expect: boolean | string | number | undefined | null | ArrayLike<boolean | string | number>;
+	};
 	hasSub: boolean;
 	expanded: boolean;
 	path: string;
@@ -27,12 +35,6 @@ export type menuDataType = Omit<
 	'level' | 'display' | 'folder' | 'hasSub' | 'expanded' | 'path'
 >;
 
-export type menuOperationType = {
-	op: string;
-	id?: string;
-	path?: string;
-	data?: Partial<menuItemType>[];
-};
 export type menuConfigType = {
 	expandOneOnSameLevel: boolean;
 };
@@ -43,6 +45,7 @@ export const menuReloadRecent = writable(false);
 export const menuPinned = writable(false);
 export const menuMobile = writable(false);
 export const menuInSession = writable(false);
+export const overPath = writable('');
 export const menuData = writable([] as Partial<menuItemType>[]);
 export const menuDataInitial = writable([] as Partial<menuItemType>[]);
 export const menuDataForSetting = writable([] as Partial<menuItemType>[]);

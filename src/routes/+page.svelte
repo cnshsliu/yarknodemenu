@@ -7,7 +7,7 @@
 		menuDataInitial,
 		menuRefreshFlag
 	} from '$lib/MenuData';
-	import type { menuItemType, menuDataType, menuOperationType } from '$lib/MenuData';
+	import type { menuItemType, menuDataType } from '$lib/MenuData';
 	const demo_insert_sub = () => {
 		let tmp = $menuData;
 		let index = tmp.findIndex((mi) => {
@@ -50,7 +50,7 @@
 <ul>
 	<li>
 		Click
-		<img src={'https://picsum.photos/id/238/32/32'} class={'tnt-logo-img'} alt="bizlogo" />
+		<img src={'/yn.png'} class={'tnt-logo-img'} alt="bizlogo" />
 		logo to toggle between logo-only mode and expanded mode
 	</li>
 	<li>Move mouse in/out menu area to toggle icon-only mode</li>

@@ -6,4 +6,4 @@
 	$: ({ tpl_action } = data);
 </script>
 
-<div class="fs-3 text-center">tpl_action: {tpl_action}</div>
+<div class="fs-3 text-center">Template action: {tpl_action}</div>

@@ -3,4 +3,4 @@
 	import { writable } from 'svelte/store';
 </script>
 
-<div class="text-center fs-3">here is Settings</div>
+<div class="text-center fs-3">Settings</div>

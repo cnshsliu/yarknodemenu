@@ -1,42 +1,27 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import PcMenu from './PcMenu.svelte';
 	import { createEventDispatcher } from 'svelte';
-	import { writable } from 'svelte/store';
 	import { onMount } from 'svelte';
-	import {
-		menuMode,
-		menuMobile,
-		menuInSession,
-		menuDataInitial,
-		menuDataForSetting,
-		menuDataFromServer,
-		menuExtra,
-		menuConfig,
-		menuRefreshFlag,
-		menuPinned
-	} from '$lib/MenuData';
-	import type { menuItemType, menuDataType, menuOperationType } from '$lib/MenuData';
+	import { menuInSession, menuDataForSetting, menuConfig, menuPinned } from '$lib/MenuData';
+	import type { menuItemType, menuDataType } from '$lib/MenuData';
 
 	export let dataMode: string = 'static';
 	export let menuDef: menuDataType[] = [{ id: 'Welcome' }];
-	export let isMobile: boolean = false;
 	export let avatar: any = { img: 'unknown' };
 	export let logo: any = { img: '/yarknode_logo.png' };
-	export let dict: Record<string, string> = {};
-
-	$menuMobile = isMobile;
+	export let menuStyle: string = 'browser';
 
 	const dispatch = createEventDispatcher();
-	let recentTemplates: string[] = [];
 
-	$menuMode = $menuMobile ? 'float-logo' : 'float-small';
-	let lastMenuMode = $menuMobile ? 'float-big' : 'float-small';
+	let menuMode: string = menuStyle === 'mobile' ? 'float-logo' : 'float-small';
+	let lastMenuMode: string = menuStyle === 'mobile' ? 'float-big' : 'float-small';
+
+	if (['mobile', 'pc', 'browser', 'windows'].indexOf(menuStyle) < 0) menuStyle = 'browser';
 
 	let overflag: Record<string, boolean> = {};
 	let pinned = false;
 	let lastPath = '';
-	let theAvatar: any;
-	let tenantList: any[] = [];
 
 	let foldersExpanding: any = {};
 	let menuItems: menuItemType[] = [];
@@ -60,16 +45,6 @@
 		}
 	};
 
-	const displayInSession = (item: menuItemType, originDisplay: boolean): boolean => {
-		if (item.insession) {
-			//>0 只在已登录状态显示
-			console.log($menuInSession);
-			if (item.insession > 0) return $menuInSession;
-			else return !$menuInSession;
-		}
-		return originDisplay;
-	};
-
 	const expandFolder = (folder: string) => {
 		foldersExpanding[folder] = true;
 		for (let i = 0; i < menuItems.length; i++) {
@@ -90,59 +65,53 @@
 		expandFolder(selfFolder);
 		item.expanded = true;
 	};
+
 	const collapseItem = (item: menuItemType) => {
 		let selfFolder = item.folder + item.id + '/';
+		const collapseFolder = (folder: string) => {
+			if (dataMode === 'editting') return;
+			foldersExpanding[folder] = false;
+			for (let i = 0; i < menuItems.length; i++) {
+				if (menuItems[i].folder.indexOf(folder) === 0) {
+					menuItems[i].display = false;
+				}
+			}
+		};
 		collapseFolder(selfFolder);
 		item.expanded = false;
-	};
-
-	const isExpanded = (item: menuItemType) => {
-		let selfFolder = item.folder + item.id + '/';
-		return foldersExpanding[selfFolder];
 	};
 
 	const isFolder = (item: menuItemType) => {
 		return item.hasSub;
 	};
 
-	const collapseFolder = (folder: string) => {
-		if (dataMode === 'editting') return;
-		foldersExpanding[folder] = false;
-		for (let i = 0; i < menuItems.length; i++) {
-			if (menuItems[i].folder.indexOf(folder) === 0) {
-				menuItems[i].display = false;
-			}
-		}
-	};
-
-	const shrink = () => {
-		if ($menuMode === 'float-big') {
-			setTimeout(() => {
-				$menuMode = 'float-small';
-			}, 3);
-		}
-	};
-	const shrinkNow = () => {
-		$menuMode = 'float-small';
-	};
-
 	const onMouseOver = () => {
 		if (dataMode === 'editting') return;
-		if ($menuMode === 'float-small') {
-			$menuMode = 'float-big';
+		if (menuMode === 'float-small') {
+			menuMode = 'float-big';
+			dispatch('sizeChanged', { from: 'float-small', to: 'float-big' });
 		}
 	};
 	const onMouseOut = () => {
 		if (dataMode === 'editting') return;
-		if ($menuMode === 'float-big' && !pinned && !$menuMobile) {
-			$menuMode = 'float-small';
+		if (menuMode === 'float-big' && !pinned) {
+			if (menuStyle === 'pc' || menuStyle === 'browser') {
+				menuMode = 'float-small';
+				dispatch('sizeChanged', { from: 'float-big', to: 'float-small' });
+			} else {
+				menuMode = 'float-logo';
+				dispatch('sizeChanged', { from: 'float-big', to: 'float-logo' });
+			}
 		}
 	};
 	const onClickLogo = () => {
-		if ($menuMode === 'float-logo') $menuMode = $menuMobile ? lastMenuMode : 'float-big';
-		else {
-			lastMenuMode = $menuMode;
-			$menuMode = 'float-logo';
+		if (menuMode === 'float-logo') {
+			menuMode = menuStyle === 'mobile' || menuStyle === 'windows' ? lastMenuMode : 'float-big';
+			dispatch('sizeChanged', { from: 'float-logo', to: menuMode });
+		} else {
+			lastMenuMode = menuMode;
+			menuMode = 'float-logo';
+			dispatch('sizeChanged', { from: lastMenuMode, to: menuMode });
 		}
 	};
 	const onBlur = () => {};
@@ -150,21 +119,14 @@
 	const onTogglePin = (e: Event) => {
 		e.preventDefault();
 		if (pinned) {
-			//$menuMode = $menuMobile ? 'float-logo' : 'float-small';
+			//menuMode =menuStyle === 'mobile' || menuStyle === 'windows' ? 'float-logo' : 'float-small';
 		} else {
-			$menuMode = 'float-big';
+			lastMenuMode = menuMode;
+			menuMode = 'float-big';
+			dispatch('sizeChanged', { from: lastMenuMode, to: menuMode });
 		}
 		pinned = !pinned;
 		$menuPinned = pinned;
-		/*
-		if ($menuMode === 'float-logo') {
-			$menuMode = lastMenuMode;
-		} else {
-			lastMenuMode = $menuMode;
-			$menuMode = 'float-logo';
-		}
-		console.log($menuMode);
-		*/
 	};
 	const onClickItem = (e: Event, item: menuItemType) => {
 		if (dataMode === 'editting') return;
@@ -192,8 +154,8 @@
 				if (lastPath.indexOf(item.path) === 0 || !item.href) collapseItem(item);
 			}
 		} else {
-			if ($menuMobile && !$menuPinned) {
-				$menuMode = 'float-logo';
+			if (menuStyle === 'mobile' || menuStyle === 'windows') {
+				menuMode = 'float-logo';
 			}
 		}
 		if (item.callback) {
@@ -254,7 +216,7 @@
 		}
 	};
 
-	export const translate = (fn) => {
+	export const translate = (fn: (str: string) => string) => {
 		for (let i = 0; i < menuItems.length; i++) {
 			let tmp = menuItems[i].alias;
 			if (!tmp) continue;
@@ -262,6 +224,22 @@
 			menuItems[i].alias = fn(tmp.slice(1));
 		}
 		menuItems = menuItems;
+	};
+
+	const checkVisible = (item: menuItemType) => {
+		let ret = true;
+		if (!item.display) {
+			ret = false;
+		} else if (!(item.visible ?? true)) {
+			ret = false;
+		} else {
+			if (item.check_visible) {
+				ret = item.check_visible.fn(item.check_visible.what, item.check_visible.expect);
+				console.log(item.alias, 3, ret, item.check_visible);
+			}
+		}
+
+		return ret;
 	};
 
 	export const refreshMenu = (newMenuDef: menuDataType[] | undefined = undefined) => {
@@ -289,181 +267,234 @@
 		console.log('In refresh menu 2', menuItems);
 	};
 
+	export const tickMenu = () => {
+		menuItems = menuItems;
+	};
+
 	onMount(async () => {
+		menuMode = menuStyle === 'mobile' || menuStyle === 'windows' ? 'float-logo' : 'float-small';
+		lastMenuMode = menuStyle === 'mobile' || menuStyle === 'windows' ? 'float-big' : 'float-small';
+		console.log('onMount: ', menuStyle, menuMode, lastMenuMode);
+
 		refreshMenu();
 		dispatch('menuMounted');
 	});
+
+	$: menuStyle &&
+		(menuMode = menuStyle === 'mobile' || menuStyle === 'windows' ? 'float-logo' : 'float-small') &&
+		(lastMenuMode =
+			menuStyle === 'mobile' || menuStyle === 'windows' ? 'float-big' : 'float-small');
 </script>
 
 <!-- svelte-ignore missing-declaration -->
-<div
-	class={'kfk-menu' +
-		' ' +
-		($menuMobile ? 'kfk-menu-mobile' : 'kfk-menu-pc') +
-		' ' +
-		($menuMode === 'float-logo' && $menuMobile ? 'kfk-ball' : '') +
-		' ' +
-		(dataMode === 'editting' ? 'editting-menu' : 'kfk-menu-' + $menuMode + ' tnt-navmenu')}
-	on:mouseenter={onMouseOver}
-	on:mouseleave={onMouseOut}
-	on:blur={onBlur}
-	on:focus={onFocus}
->
-	{#if dataMode !== 'editting'}
-		<div class="hstack  gap-2">
-			<div
-				class={'col ' + ($menuInSession ? 'org-logo' : 'tnt-logo')}
-				on:click={onClickLogo}
-				on:keydown={onClickLogo}
-				on:mouseenter={() => {
-					overflag['logo'] = true;
-				}}
-				on:mouseleave={() => {
-					overflag['logo'] = false;
-				}}
-				on:blur={onBlur}
-				on:focus={onFocus}
-			>
-				<img
-					src={logo.img}
-					class={logo.class ?? 'tnt-logo-img' + ' ' + (overflag['logo'] ? 'logo-over' : '')}
-					alt="bizlogo"
-				/>
-			</div>
-			<div class="ms-auto hstack gap-2">
-				<slot name="me">
-					{#if avatar.img !== 'unknown'}
-						<div
-							class="togglepin "
-							on:mouseenter={() => {
-								overflag['top-avatar'] = true;
-							}}
-							on:mouseleave={() => {
-								overflag['top-avatar'] = false;
-							}}
-						>
-							<img
-								src={avatar.img}
-								class={(avatar.class ?? 'avatar32') +
-									' ' +
-									(overflag['top-avatar'] ? 'avatar-over' : '')}
-								alt="avatar"
-							/>
-						</div>
-					{/if}
-				</slot>
-				<div
-					class="togglepin"
-					on:mouseenter={() => {
-						overflag['home'] = true;
-					}}
-					on:mouseleave={() => {
-						overflag['home'] = false;
-					}}
-				>
-					<a href={'/'} alt="pinit">
-						<i class={'bi fs-5 bi-house' + (overflag['home'] ? '-fill' : '')} />
-					</a>
-				</div>
-				<div
-					class="m-0 p-0 togglepin"
-					on:mouseenter={() => {
-						overflag['pin'] = true;
-					}}
-					on:mouseleave={() => {
-						overflag['pin'] = false;
-					}}
-				>
-					<a href={null} alt="pinit">
-						<i
-							class={'bi fs-5 ' +
-								(pinned
-									? overflag['pin']
-										? 'bi-pin'
-										: 'bi-pin-fill'
-									: overflag['pin']
-									? 'bi-pin-angle-fill'
-									: 'bi-pin-angle')}
-							on:click={onTogglePin}
-							on:keydown={onTogglePin}
-						/>
-					</a>
-				</div>
-				<div
-					class="m-0 p-0 togglepin"
-					on:mouseenter={() => {
-						overflag['close'] = true;
-					}}
-					on:mouseleave={() => {
-						overflag['close'] = false;
-					}}
-				>
-					<a href={null} alt="closeit">
-						<i
-							class={'bi fs-5 ' + (overflag['close'] ? 'bi-x-circle-fill' : 'bi-x-lg')}
-							on:click={onClickLogo}
-							on:keydown={onClickLogo}
-						/>
-					</a>
-				</div>
-			</div>
-		</div>
-	{/if}
-	{#if $menuMode !== 'float-logo'}
-		<div>
-			{#each menuItems as item, index (item)}
-				{#if item.display && (!item.insession || (item.insession > 0 && $menuInSession) || (item.insession < 0 && !$menuInSession))}
+{#if menuStyle === 'pc'}
+	<PcMenu {menuItems} {logo} {avatar} on:changeStyle on:changeWorklistStatus />
+{:else}
+	<div
+		class={'kfk-menu' +
+			' ' +
+			'kfk-menu-style-' +
+			menuStyle +
+			' ' +
+			(dataMode === 'editting' ? 'editting-menu' : 'kfk-menu-' + menuMode + ' tnt-navmenu')}
+		on:mouseenter={onMouseOver}
+		on:mouseleave={onMouseOut}
+		on:blur={onBlur}
+		on:focus={onFocus}
+	>
+		{#if dataMode !== 'editting'}
+			<div class="hstack  gap-2">
+				{#if menuStyle === 'pc' || menuStyle === 'browser'}
+					<!-- top logo --->
 					<div
-						class={dataMode === 'editting' ? 'menuitem-editting' : 'menuitem'}
-						style={$menuMode === 'float-small' && dataMode !== 'editting'
-							? 'margin-left: 8px;'
-							: `margin-left: ${8 + (item.level ?? 0) * 16}px;`}
-						on:keydown={null}
-						on:click={(e) => {
-							onClickItem(e, item);
+						class="org-logo"
+						style={logo.img ? `background-image: url(${logo.img}); ` : ''}
+						on:click={onClickLogo}
+						on:keydown={onClickLogo}
+						on:mouseenter={() => {
+							overflag['logo'] = true;
 						}}
+						on:mouseleave={() => {
+							overflag['logo'] = false;
+						}}
+						on:blur={onBlur}
+						on:focus={onFocus}
 					>
-						<div class="w-100 row m-0 p-0">
-							<div class="col m-0 p-0">
-								<!--start 显示图标 -->
-								{#if item.id === '____ME'}
-									{#if $menuInSession && avatar.img !== 'unknown'}
-										<img src={avatar.img} class={avatar.class ?? 'avatar16'} alt="avatar" />
-									{:else}
-										<i class="bi bi-person" />
-									{/if}
-								{:else if item.icon}
-									<i class={`bi bi-${item.icon}`} />
-								{:else if item.img}
-									<img src={item.img} alt={item.id} class="avatar16" />
-								{/if}
-								<!--end 显示图标 -->
-								<!--start 显示文字 -->
-								{#if dataMode !== 'editting' && $menuMode === 'float-small'}
-									<!-- 窄屏方式且没有icon,显示第一个字符 -->
-									{#if !(item.icon || item.img)}
-										<div class="w-100 text-center">
-											{getLabel(item).charAt(0)}
-										</div>
-									{/if}
-								{:else}
-									<!-- 宽屏方式显示文字 -->
-									{getLabel(item)}
-								{/if}
-								<!--end 显示文字 -->
-							</div>
-							{#if $menuMode === 'float-big' && item.hasSub}
-								<div class="col-auto m-0 ms-5 p-0">
-									<i class={'bi ' + (item.expanded ? 'bi-chevron-up' : 'bi-chevron-right')} />
+						&nbsp;
+					</div>
+				{/if}
+				{#if menuMode !== 'float-logo' && menuMode !== 'float-small'}
+					<div
+						class={(menuStyle === 'mobile' || menuStyle === 'windows' ? '' : 'ms-auto') +
+							' hstack w-100 gap-2'}
+					>
+						<slot name="me">
+							{#if avatar.img !== 'unknown'}
+								<div
+									class="togglepin "
+									on:mouseenter={() => {
+										overflag['top-avatar'] = true;
+									}}
+									on:mouseleave={() => {
+										overflag['top-avatar'] = false;
+									}}
+								>
+									<img
+										src={avatar.img}
+										class={(avatar.class ?? 'avatar32') +
+											' ' +
+											(overflag['top-avatar'] ? 'avatar-over' : '')}
+										alt="avatar"
+									/>
 								</div>
 							{/if}
+						</slot>
+						<div
+							class={(menuStyle === 'mobile' || menuStyle === 'windows' ? 'ms-auto' : '') +
+								' togglepin'}
+							on:mouseenter={() => {
+								overflag['home'] = true;
+							}}
+							on:mouseleave={() => {
+								overflag['home'] = false;
+							}}
+						>
+							<a href={'/'} alt="pinit">
+								<i class={'bi fs-5 bi-house' + (overflag['home'] ? '-fill' : '')} />
+							</a>
+						</div>
+						<div
+							class="m-0 p-0 togglepin"
+							on:mouseenter={() => {
+								overflag['pin'] = true;
+							}}
+							on:mouseleave={() => {
+								overflag['pin'] = false;
+							}}
+						>
+							<a href={null} alt="pinit">
+								<i
+									class={'bi fs-5 ' +
+										(pinned
+											? overflag['pin']
+												? 'bi-pin'
+												: 'bi-pin-fill'
+											: overflag['pin']
+											? 'bi-pin-angle-fill'
+											: 'bi-pin-angle')}
+									on:click={onTogglePin}
+									on:keydown={onTogglePin}
+								/>
+							</a>
+						</div>
+						<div
+							class="m-0 p-0 togglepin"
+							on:mouseenter={() => {
+								overflag['close'] = true;
+							}}
+							on:mouseleave={() => {
+								overflag['close'] = false;
+							}}
+						>
+							<a href={null} alt="closeit">
+								<i
+									class={'bi fs-5 ' + (overflag['close'] ? 'bi-x-circle-fill' : 'bi-x-lg')}
+									on:click={onClickLogo}
+									on:keydown={onClickLogo}
+								/>
+							</a>
 						</div>
 					</div>
 				{/if}
-			{/each}
-		</div>
-	{/if}
-</div>
+			</div>
+		{/if}
+		{#if menuMode !== 'float-logo'}
+			<div>
+				{#each menuItems as item}
+					{#if checkVisible(item)}
+						<div
+							class={dataMode === 'editting' ? 'menuitem-editting' : 'menuitem'}
+							style={menuMode === 'float-small' && dataMode !== 'editting'
+								? 'margin-left: 8px;'
+								: `margin-left: ${8 + (item.level ?? 0) * 16}px;`}
+							on:keydown={null}
+							on:click={(e) => {
+								onClickItem(e, item);
+							}}
+						>
+							<div class="w-100 row m-0 p-0">
+								<div class="col m-0 p-0">
+									<!--start 显示图标 -->
+									{#if item.id === '____ME'}
+										{#if $menuInSession && avatar.img !== 'unknown'}
+											<img src={avatar.img} class={avatar.class ?? 'avatar16'} alt="avatar" />
+										{:else}
+											<i class="bi bi-person" />
+										{/if}
+									{:else if item.icon}
+										<i class={`bi bi-${item.icon}`} />
+									{:else if item.img}
+										<img src={item.img} alt={item.id} class="avatar16" />
+									{/if}
+									<!--end 显示图标 -->
+									<!--start 显示文字 -->
+									{#if dataMode !== 'editting' && menuMode === 'float-small'}
+										<!-- 窄屏方式且没有icon,显示第一个字符 -->
+										{#if !(item.icon || item.img)}
+											<div class="w-100 text-center">
+												{getLabel(item).charAt(0)}
+											</div>
+										{/if}
+									{:else}
+										<!-- 宽屏方式显示文字 -->
+										{getLabel(item)}
+									{/if}
+									<!--end 显示文字 -->
+								</div>
+								{#if menuMode === 'float-big' && item.hasSub}
+									<div class="col-auto m-0 ms-5 p-0">
+										<i class={'bi ' + (item.expanded ? 'bi-chevron-up' : 'bi-chevron-right')} />
+									</div>
+								{/if}
+							</div>
+						</div>
+					{/if}
+				{/each}
+				<div>
+					<hr class="m-0 p-0 mt-2" />
+				</div>
+			</div>
+		{/if}
+		{#if dataMode !== 'editting'}
+			{#if menuStyle === 'mobile' || menuStyle === 'windows'}
+				<div class="hstack  gap-2">
+					<!-- bottom logo -->
+					<div
+						class={(menuStyle === 'mobile' ? 'ms-auto' : ' ') + ' org-logo'}
+						style={logo.img ? `background-image: url(${logo.img}); ` : ''}
+						on:click={onClickLogo}
+						on:keydown={onClickLogo}
+						on:mouseenter={() => {
+							overflag['logo'] = true;
+						}}
+						on:mouseleave={() => {
+							overflag['logo'] = false;
+						}}
+						on:blur={onBlur}
+						on:focus={onFocus}
+					>
+						&nbsp;
+						<!--img
+						src={logo.img}
+						class={logo.class ?? 'tnt-logo-img' + ' ' + (overflag['logo'] ? 'logo-over' : '')}
+						alt="bizlogo"
+					/-->
+					</div>
+				</div>
+			{/if}
+		{/if}
+	</div>
+{/if}
 
 <style>
 	.kfk-menu {
@@ -477,15 +508,16 @@
 		background-color: #cccccc;
 		border-radius: 5px;
 	}
-	.kfk-ball {
-		border-radius: 100px !important;
-	}
-	.kfk-menu-pc {
+	.kfk-menu-style-pc {
 		left: 0px;
 		top: 10px;
 	}
-	.kfk-menu-mobile {
+	.kfk-menu-style-mobile {
 		right: 2px;
+		bottom: 2px;
+	}
+	.kfk-menu-style-windows {
+		left: 2px;
 		bottom: 2px;
 	}
 	.kfk-menu-float-logo {
@@ -548,8 +580,14 @@
 		border: inset;
 		border-color: var(--bs-primary);
 	}
-	.tnt-logo-img {
+
+	.org-logo {
 		width: 32px;
 		height: 32px;
+		min-width: 32px;
+		min-height: 32px;
+		background-repeat: no-repeat;
+		background-size: 100%;
+		background-position: center;
 	}
 </style>

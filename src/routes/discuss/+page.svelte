@@ -3,4 +3,6 @@
 	import { writable } from 'svelte/store';
 </script>
 
-<div class="text-center fs-3">Forum</div>
+<div class="top-50 start-50 translate-middle">
+	<div class="text-center fs-3">Forum</div>
+</div>
