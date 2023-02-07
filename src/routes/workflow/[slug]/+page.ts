@@ -1,6 +1,6 @@
 import type { PageLoad } from './$types';
 
-export const load: PageLoad = async ({ params, url, fetch, parent }) => {
+export const load: PageLoad = async ({ params }) => {
 	return {
 		action: params.slug
 	};

@@ -1,13 +1,5 @@
 <script lang="ts">
-	import {
-		menuMobile,
-		menuPinned,
-		menuMode,
-		menuData,
-		menuDataInitial,
-		menuRefreshFlag
-	} from '$lib/MenuData';
-	import type { menuItemType, menuDataType } from '$lib/MenuData';
+	import { menuData, menuDataInitial, menuRefreshFlag } from '$lib/MenuData';
 	const demo_insert_sub = () => {
 		let tmp = $menuData;
 		let index = tmp.findIndex((mi) => {
@@ -76,12 +68,3 @@
 	</li>
 	<li>Sign in/out: Play with sign in/out to see what happens to the menu</li>
 </ul>
-
-<style>
-	pre {
-		border: 1px solid gray;
-	}
-	span {
-		visibility: hidden;
-	}
-</style>

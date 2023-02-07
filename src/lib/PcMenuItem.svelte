@@ -79,7 +79,7 @@
 	};
 </script>
 
-{#if !item.insession || (item.insession > 0 && $menuInSession) || (item.insession < 0 && !$menuInSession)}
+{#if true}
 	<div>
 		{#if !item.hasSub}
 			<div
@@ -96,7 +96,7 @@
 				{getLabel(item)}
 			</div>
 		{:else}
-			<div class="dropdown" class:dropend={item.level > 0}>
+			<div class="dropdown" class:dropend={item.level && item.level > 0}>
 				<div
 					class={'dropdown-toggle btn'}
 					id={item.id}
@@ -106,7 +106,8 @@
 						onClickItem(e, item);
 					}}
 					on:mouseenter={(e) => {
-						document.getElementById(item.id).click();
+						let elem = document.getElementById(item.id);
+						if (elem) elem.click();
 						$overPath = item.path;
 					}}
 					on:mouseleave={(e) => {
@@ -134,9 +135,3 @@
 		{/if}
 	</div>
 {/if}
-
-<style>
-	.moveleft {
-		margin-left: 20px !important;
-	}
-</style>

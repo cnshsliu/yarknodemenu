@@ -34,7 +34,6 @@
 			//如多余10个,则限制在10个
 			rcts.splice(10);
 		}
-		console.log('Save on BIZ  -------->', tplid, old_rcts, rcts);
 		localStorage.setItem('recentTemplates', JSON.stringify(rcts));
 		let tmpData: menuDataType[] = [];
 		for (let i = 0; i < rcts.length; i++) {
@@ -52,25 +51,17 @@
 
 	$: example_saveOneBiz($currentBiz);
 
-	function getBootstrapBreakpoint(w: number) {
-		const ret = w < 576 ? 0 : w < 768 ? 1 : w < 992 ? 2 : w < 1200 ? 3 : w < 1400 ? 4 : 5;
-		console.log('Get bootstrap breakpoint', ret);
-		return ret;
-	}
-
 	const onChangeWorklistStatus = async (event: CustomEvent) => {
 		const payload = event.detail;
 		if (payload === undefined) return;
 
 		$demoData = payload;
-		console.log($demoData);
 		goto(`/work`);
 	};
 
 	const onSizeChanged = async (event: CustomEvent) => {
 		const payload = event.detail;
 		if (payload === undefined) return;
-		console.log(payload);
 		if (menuStyle === 'mobile') return '';
 		switch (payload.to) {
 			case 'float-logo':
@@ -86,7 +77,6 @@
 	const onChangeStyle = async (event: CustomEvent) => {
 		const payload = event.detail;
 		if (payload === undefined) return;
-		console.log(payload);
 		menuStyle = payload.style;
 		notify.message = `Style changed to ${menuStyle}`;
 		const toast = new Toast(document.getElementById('liveToast') as Element);
@@ -264,7 +254,6 @@
 	];
 
 	onMount(() => {
-		console.log(navigator?.userAgent);
 		isMobile = navigator
 			? navigator.userAgent.match(/Android/i) ||
 			  navigator.userAgent.match(/webOS/i) ||
@@ -280,7 +269,7 @@
 		if (isMobile) {
 			menuStyle = 'mobile';
 		} else {
-			menuStyle = 'browser';
+			menuStyle = 'pc';
 		}
 
 		if (menuStyle === 'mobile') mainAreaClass = '';

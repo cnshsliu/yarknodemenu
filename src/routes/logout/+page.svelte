@@ -1,6 +1,5 @@
 <script lang="ts">
-	import { page } from '$app/stores';
-	import { demoData, menuInSession } from '$lib/MenuData';
+	import { menuInSession } from '$lib/MenuData';
 	const logout = () => {
 		$menuInSession = false;
 	};

@@ -1,5 +1,5 @@
 {
-	"name": "@yarknode/menu",
+	"name": "@yarknode/svelte-menu",
 	"version": "0.0.17",
 	"scripts": {
 		"dev": "vite dev",

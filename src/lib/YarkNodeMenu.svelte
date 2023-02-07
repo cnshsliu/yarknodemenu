@@ -329,6 +329,7 @@
 							' hstack w-100 gap-2'}
 					>
 						<slot name="me">
+							<!-- 缺省 avatar 用图片 -->
 							{#if avatar.img !== 'unknown'}
 								<div
 									class="togglepin "

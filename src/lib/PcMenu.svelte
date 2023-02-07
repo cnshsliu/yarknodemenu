@@ -1,123 +1,26 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
-	import { createEventDispatcher } from 'svelte';
 	import PcMenuItem from './PcMenuItem.svelte';
 	import { onMount } from 'svelte';
-	import { menuInSession, menuConfig } from '$lib/MenuData';
 	import type { menuItemType } from '$lib/MenuData';
 
 	export let menuItems: menuItemType[] = [];
 	export let avatar: any = { img: 'unknown' };
 	export let logo: any = { img: '/yarknode_logo.png' };
 
-	const dispatch = createEventDispatcher();
-	let menuMode = 'float-big';
-
 	let overflag: Record<string, boolean> = {};
-	let lastPath = '';
 
-	let foldersExpanding: any = {};
-
-	const expandFolder = (folder: string) => {
-		foldersExpanding[folder] = true;
-		for (let i = 0; i < menuItems.length; i++) {
-			if (menuItems[i].folder === folder) {
-				//展开当前菜单及其所有直接子级
-				menuItems[i].display = true;
-			} else if (menuItems[i].folder.indexOf(folder) === 0) {
-				//展开 之前被展开过的孙级
-				if (foldersExpanding[menuItems[i].folder]) {
-					menuItems[i].display = true;
-				}
-			}
-		}
-	};
-
-	const expandItem = (item: menuItemType) => {
-		let selfFolder = item.folder + item.id + '/';
-		expandFolder(selfFolder);
-		item.expanded = true;
-	};
-	const collapseItem = (item: menuItemType) => {
-		let selfFolder = item.folder + item.id + '/';
-		collapseFolder(selfFolder);
-		item.expanded = false;
-	};
-
-	const isExpanded = (item: menuItemType) => {
-		let selfFolder = item.folder + item.id + '/';
-		return foldersExpanding[selfFolder];
-	};
-
-	const isFolder = (item: menuItemType) => {
-		return item.hasSub;
-	};
-
-	const collapseFolder = (folder: string) => {
-		foldersExpanding[folder] = false;
-		for (let i = 0; i < menuItems.length; i++) {
-			if (menuItems[i].folder.indexOf(folder) === 0) {
-				menuItems[i].display = false;
-			}
-		}
+	const mygoto = (url: string) => {
+		document.getElementById('___ykmenu_hidden_a')?.setAttribute('href', url);
+		document.getElementById('___ykmenu_hidden_a')?.click();
 	};
 
 	const onMouseOver = () => {};
 	const onMouseOut = () => {};
 	const onClickLogo = () => {
-		goto('/');
+		mygoto('/');
 	};
 	const onBlur = () => {};
 	const onFocus = () => {};
-	const onClickItem = (e: Event, item: menuItemType) => {
-		e.preventDefault();
-		if (isFolder(item)) {
-			if (item.expanded === false) {
-				expandItem(item);
-				if ($menuConfig.expandOneOnSameLevel) {
-					let changed = false;
-					for (let i = 0; i < menuItems.length; i++) {
-						if (
-							menuItems[i].level === item.level &&
-							menuItems[i].path !== item.path &&
-							menuItems[i].expanded === true
-						) {
-							collapseItem(menuItems[i]);
-							changed = true;
-						}
-					}
-					if (changed) {
-						menuItems = menuItems;
-					}
-				}
-			} else {
-				if (lastPath.indexOf(item.path) === 0 || !item.href) collapseItem(item);
-			}
-		}
-		if (item.callback) {
-			try {
-				dispatch(item.callback, item.payload);
-			} catch (e) {
-				console.error(e);
-			}
-		}
-		if (item.target) {
-			window && window.open(item.href, item.target);
-		} else if (item.href) goto(item.href);
-		lastPath = item.path;
-		menuItems = menuItems;
-	};
-
-	//TODO:
-	const getLabel = (item: menuItemType): string => {
-		let label = item.id;
-		if (item.alias) {
-			label = item.alias;
-		} else {
-			label = item.id;
-		}
-		return label;
-	};
 
 	const checkVisible = (item: menuItemType) => {
 		let ret = true;
@@ -128,7 +31,6 @@
 		} else {
 			if (item.check_visible) {
 				ret = item.check_visible.fn(item.check_visible.what, item.check_visible.expect);
-				console.log(item.alias, 3, ret, item.check_visible);
 			}
 		}
 
@@ -162,7 +64,7 @@
 		>
 			&nbsp;
 		</div>
-		{#each menuItems.filter((item) => item.level === 0) as item, index (item)}
+		{#each menuItems.filter((item) => item.level === 0) as item}
 			{#if checkVisible(item)}
 				<PcMenuItem {menuItems} {item} on:changeStyle on:changeWorklistStatus />
 			{/if}
