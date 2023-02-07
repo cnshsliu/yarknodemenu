@@ -1,14 +1,13 @@
 <script lang="ts">
-	import YarkNodeMenu from '$lib/YarkNodeMenu.svelte';
+	import { mygoto } from '$lib/Util';
+	import Menu from '$lib/Menu.svelte';
 	import { onMount } from 'svelte';
-	import { page } from '$app/stores';
-	import { goto } from '$app/navigation';
 	import { menuInSession, currentBiz, demoData } from '$lib/MenuData';
 	import type { menuDataType } from '$lib/MenuData';
 	import { Toast } from 'bootstrap';
 
 	let theMenu: any;
-	$menuInSession = $page.data.user ? true : false;
+	$menuInSession = false;
 
 	let isMobile: boolean = false;
 	let menuStyle: string = 'browser';
@@ -56,7 +55,7 @@
 		if (payload === undefined) return;
 
 		$demoData = payload;
-		goto(`/work`);
+		mygoto(`/work`);
 	};
 
 	const onSizeChanged = async (event: CustomEvent) => {
@@ -290,7 +289,7 @@
 	<link rel="stylesheet" href="/demo.css" />
 </svelte:head>
 
-<YarkNodeMenu
+<Menu
 	bind:this={theMenu}
 	{menuDef}
 	{menuStyle}

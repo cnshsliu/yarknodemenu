@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { mygoto } from '$lib/Util';
 	import PcMenuItem from './PcMenuItem.svelte';
 	import { onMount } from 'svelte';
 	import type { menuItemType } from '$lib/MenuData';
@@ -8,11 +9,6 @@
 	export let logo: any = { img: '/yarknode_logo.png' };
 
 	let overflag: Record<string, boolean> = {};
-
-	const mygoto = (url: string) => {
-		document.getElementById('___ykmenu_hidden_a')?.setAttribute('href', url);
-		document.getElementById('___ykmenu_hidden_a')?.click();
-	};
 
 	const onMouseOver = () => {};
 	const onMouseOut = () => {};

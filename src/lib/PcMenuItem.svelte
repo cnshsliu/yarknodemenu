@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
+	import { mygoto } from '$lib/Util';
 	import type { menuItemType } from '$lib/MenuData';
 	import { menuInSession, overPath } from '$lib/MenuData';
 	import { createEventDispatcher } from 'svelte';
@@ -66,7 +66,14 @@
 		}
 		if (item.target) {
 			window && window.open(item.href, item.target);
-		} else if (item.href) goto(item.href);
+		} else if (item.href) {
+			console.log('goto(item.href)');
+			try {
+				mygoto(item.href);
+			} catch (e) {
+				console.log(e.message);
+			}
+		}
 		menuItems = menuItems;
 	};
 

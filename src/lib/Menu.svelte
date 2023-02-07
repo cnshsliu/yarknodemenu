@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
 	import PcMenu from './PcMenu.svelte';
+	import { mygoto } from '$lib/Util';
 	import { createEventDispatcher } from 'svelte';
 	import { onMount } from 'svelte';
 	import { menuInSession, menuDataForSetting, menuConfig, menuPinned } from '$lib/MenuData';
@@ -168,7 +168,7 @@
 		if (dataMode !== 'editting') {
 			if (item.target) {
 				window && window.open(item.href, item.target);
-			} else if (item.href) goto(item.href);
+			} else if (item.href) mygoto(item.href);
 		}
 		lastPath = item.path;
 		menuItems = menuItems;
@@ -286,6 +286,7 @@
 			menuStyle === 'mobile' || menuStyle === 'windows' ? 'float-big' : 'float-small');
 </script>
 
+<a href={'#'} id="___ykmenu_hidden_a" style={'display: none;'}>&nbsp;</a>
 <!-- svelte-ignore missing-declaration -->
 {#if menuStyle === 'pc'}
 	<PcMenu {menuItems} {logo} {avatar} on:changeStyle on:changeWorklistStatus />
