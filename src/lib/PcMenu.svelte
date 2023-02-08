@@ -60,7 +60,7 @@
 		>
 			&nbsp;
 		</div>
-		{#each menuItems.filter((item) => item.level === 0) as item}
+		{#each menuItems.filter((item) => item.level === 0) as item, index}
 			{#if checkVisible(item)}
 				<PcMenuItem {menuItems} {item} on:changeStyle on:changeWorklistStatus />
 			{/if}

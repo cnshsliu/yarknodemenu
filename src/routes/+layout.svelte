@@ -2,7 +2,7 @@
 	import { mygoto } from '$lib/Util';
 	import Menu from '$lib/Menu.svelte';
 	import { onMount } from 'svelte';
-	import { menuInSession, currentBiz, demoData } from '$lib/MenuData';
+	import { menuInSession, demoData } from '$lib/MenuData';
 	import type { menuDataType } from '$lib/MenuData';
 	import { Toast } from 'bootstrap';
 
@@ -13,42 +13,6 @@
 	let menuStyle: string = 'browser';
 	let mainAreaClass: string = 'main-area-width-small';
 	let notify = { message: '' };
-
-	const example_saveOneBiz = function (tplid: string) {
-		if (tplid === null || tplid === undefined || tplid === '') return;
-		if (!localStorage) return;
-
-		let rcts = JSON.parse(localStorage.getItem('recentTemplates') ?? JSON.stringify([]));
-		let old_rcts = [...rcts];
-		let tmp = rcts.indexOf(tplid);
-		if (tmp === 0) return; //如果已经是第一项,则直接返回,不用处理
-
-		if (tmp >= 0) {
-			//如果找到, 就在原位置删除
-			rcts.splice(tmp, 1);
-		}
-
-		rcts.unshift(tplid); //在头部加入
-		if (rcts.length > 10) {
-			//如多余10个,则限制在10个
-			rcts.splice(10);
-		}
-		localStorage.setItem('recentTemplates', JSON.stringify(rcts));
-		let tmpData: menuDataType[] = [];
-		for (let i = 0; i < rcts.length; i++) {
-			tmpData.push({
-				id: `__recentbiz_${rcts[i]}`,
-				class: 'recent_biz',
-				alias: rcts[i],
-				href: `/biz/${rcts[i]}`,
-				icon: 'dot'
-			});
-		}
-
-		theMenu.replaceChildren('___recentbiz', tmpData);
-	};
-
-	$: example_saveOneBiz($currentBiz);
 
 	const onChangeWorklistStatus = async (event: CustomEvent) => {
 		const payload = event.detail;
@@ -190,11 +154,11 @@
 			icon: 'question-circle'
 		},
 		{
-			id: '___demo',
-			class: 'demo',
-			alias: 'Demo',
+			id: '___searchEngine',
+			class: 'part3',
 			href: '/',
-			icon: 'flower1'
+			alias: 'SearchEngine',
+			icon: 'google'
 		},
 		{
 			id: '___recentbiz',

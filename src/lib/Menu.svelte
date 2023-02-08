@@ -3,7 +3,15 @@
 	import { mygoto } from '$lib/Util';
 	import { createEventDispatcher } from 'svelte';
 	import { onMount } from 'svelte';
-	import { menuInSession, menuDataForSetting, menuConfig, menuPinned } from '$lib/MenuData';
+	import {
+		menuDataForGet,
+		menuDataForSet,
+		menuInSession,
+		menuDataForSetting,
+		menuConfig,
+		menuPinned,
+		menuRefreshFlag
+	} from '$lib/MenuData';
 	import type { menuItemType, menuDataType } from '$lib/MenuData';
 
 	export let dataMode: string = 'static';
@@ -13,6 +21,16 @@
 	export let menuStyle: string = 'browser';
 
 	const dispatch = createEventDispatcher();
+
+	//copy menuDef to $menuDataForGet once changed.
+	//Else where, could get internal menuDef by $menuDataForGet
+	$: $menuDataForGet = menuDef;
+	//Once menuRefreshFlag was set to true, refresh menu with data in $menuDataForSet;
+	$: $menuRefreshFlag &&
+		(() => {
+			refreshMenu($menuDataForSet);
+			$menuRefreshFlag = false;
+		})();
 
 	let menuMode: string = menuStyle === 'mobile' ? 'float-logo' : 'float-small';
 	let lastMenuMode: string = menuStyle === 'mobile' ? 'float-big' : 'float-small';
@@ -34,7 +52,7 @@
 				level,
 				display: dataMode === 'editting' ? true : false,
 				folder: folder,
-				hasSub: data[i].sub ? true : false,
+				hasSub: data[i].sub ? (data[i].sub.length > 0 ? true : false) : false,
 				expanded: false,
 				path: folder + data[i].id
 			};
@@ -185,7 +203,7 @@
 		return label;
 	};
 
-	export const replaceChildren = (theID: string, children: menuDataType[]) => {
+	const replaceChildren = (theID: string, children: menuDataType[]) => {
 		let rbIndex = menuItems.map((mi) => mi.id).indexOf(theID);
 		if (rbIndex >= 0) {
 			let rb = menuItems[rbIndex];
@@ -242,7 +260,7 @@
 		return ret;
 	};
 
-	export const refreshMenu = (newMenuDef: menuDataType[] | undefined = undefined) => {
+	const refreshMenu = (newMenuDef: menuDataType[] | undefined = undefined) => {
 		if (newMenuDef) menuDef = newMenuDef;
 		console.log('In refresh menu 2', menuDef);
 		switch (dataMode) {

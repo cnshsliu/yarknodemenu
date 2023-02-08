@@ -87,7 +87,7 @@
 </script>
 
 {#if true}
-	<div>
+	<div class="ms-1">
 		{#if !item.hasSub}
 			<div
 				class={'dropdown-item btn'}

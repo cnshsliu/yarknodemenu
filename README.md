@@ -254,11 +254,12 @@ Binding component to a variable makes it easier to handle menu dynamically later
 
 # Change menuitems on fly
 
-Change menuitems defintion, passed it to refreshMenu.
+Change menuitems defintion, passed it to $menuDataForSet and set $menuRefreshFlag to true.
 
 ```
-let menuDef = [...];
-theMenu.refreshMenu(menuDef);
+let newMenus = [...];
+$menuDataForSet = newMenus;
+$menuRefreshFlag = true;
 ```
 
 # Control the visiblilty of a specific menu item:
@@ -323,6 +324,14 @@ Once the Menu beging ticked, svelte-menu will re-run "check_visible", thus, call
 
 In the demo, $menuInSession stores a true value on user being logged in, a false value on logging out, thus, when user is logged in, "Signin" is hdden while "Signout" is shown, and vice versa
 
-```
+# use own component for user avatar
+
+svelte-menu has a slot named as "me", so if you'd like to use your own component to display user avatar, maybe a dropdown to provide more info for your user. just place it like below:
 
 ```
+<Menu>
+    <MyComp slot="me" />
+</Menu>
+```
+
+The above codes will replace user avatar with "MyComp"
