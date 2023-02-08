@@ -341,7 +341,7 @@
 				{#if menuMode !== 'float-logo' && menuMode !== 'float-small'}
 					<div
 						class={(menuStyle === 'mobile' || menuStyle === 'windows' ? '' : 'ms-auto') +
-							' hstack w-100 gap-2'}
+							' hstack  gap-2'}
 					>
 						<slot name="me">
 							<!-- 缺省 avatar 用图片 -->
