@@ -1,12 +1,30 @@
 # Svelte-menu
 
-A full-featured sveltekit menu component.
+A full-featured <a href="https://kit.svelte.dev/">SvelteKit</a> menu component.
 
 Demo site: <a href="https://menu-demo-lyart.vercel.app/">https://menu-demo-lyart.vercel.app/</a>
 
 Try the demo first, then read on please.
 
+# Dependencies
+
+Read on to decide whether this componet is compatible to your projects.
+
+Warning: this menu componet is capable to SvelteKit project, because it use SvelteKit-specific modules "$app/navigation".
+
+I only use "goto" function of "$app/navigation", once I find a way to navigate among Svelte routes the same way as SvelteKit does, I may remove the dependency to "SvelteKit", then, this component will be available to all Vite-based projects. Meanwhile, I really suggest you give SvelteKit a try if you have not, it gives me a charming experience.
+
+This component uses <a href="https://getbootstrap.com/">bootstrap</a> as well.
+
 # Usage
+
+## Use demo site as a boilerplate
+
+```
+git clone https://github.com/cnshsliu/menu.demo
+```
+
+Or, added to your exiting project following next steps
 
 ## install package
 
@@ -18,7 +36,7 @@ npm i @yarknode/svelte-menu
 
 Normally, we place menu in "src/routes/+layout.svelte"
 
-with "src/routes/+layout.svelte"
+First, define menu structure:
 
 ```typescript
 <script lang="ts">
@@ -64,7 +82,7 @@ const menuDef: menuDataType[] = [
 </script>
 ```
 
-Then,
+Then, place &lt;Menu&gt; component in "+layout.svelte"
 
 ```xml
 <Menu
@@ -82,7 +100,7 @@ Then,
 Look, there are three custom event handlers.
 The first is "on:changeWorklistStatus", the event name "changeWorklistStatus" should be the same as what we defined in menuitem previously.
 
-"onChangeWorklistStauts" is a function defined in "+layout.svelte",
+The event handler "onChangeWorklistStatus" is defined in "+layout.svelte",
 
 ```javascript
 const onChangeWorklistStatus = async (event: CustomEvent) => {
@@ -96,7 +114,9 @@ const onChangeWorklistStatus = async (event: CustomEvent) => {
 
 Of course, this is an example callback function, you should use your own as required.
 
-However, normally you need to keep the second "on:sizeChanged", because svelte-menu can change it's own size on mouse enter/leave, and we should catch this event to change the position of main area.
+However, normally you need to keep the second "on:sizeChanged", because svelte-menu can change it's own size on mouse enter/leave, and we should catch this event to change the position of main display area.
+
+Here is the exmapple in demo, you may change it accordinly to fit your need.
 
 ```javascript
 const onSizeChanged = async (event: CustomEvent) => {
@@ -115,9 +135,7 @@ const onSizeChanged = async (event: CustomEvent) => {
 };
 ```
 
-The third on is "on:styleChanged", If you are going to let your users to toggle among menu styles on-demand with menuitems, keep this event handler. and have menuitem definition accordinly.
-
-Menu items definiton for changing menu styles.
+The third on is "on:styleChanged", If you are going to let your users to toggle among menu styles on-demand just within the menu, keep this event handler. and have menuitems defined like below:
 
 ```json
 {
@@ -166,7 +184,7 @@ The handler:
 	};
 ```
 
-Of course, you may decide to use one menu style, just pass it to Menu component like:
+Of course, you may decide to provie one menu style to your user, just pass it to Menu component like this then:
 
 ```
 <Menu
@@ -174,9 +192,9 @@ menuStyle={"browser"}
 />
 ```
 
-## Menu Styles
+## About Menu Styles
 
-We support four menu styles:
+We support four menu styles: browser, pc, mobile and windows.
 
 - browser
 
@@ -208,15 +226,7 @@ We support four menu styles:
 
   - touch icon to show/hide menus
 
-If you're seeing this, you've probably already done this step. Congrats!
-
-```bash
-# create a new project in the current directory
-npm create svelte@latest
-
-# create a new project in my-app
-npm create svelte@latest my-app
-```
+In the demo, we also have mobile detection codes in onMount, if the demo is running on mobile devices, it will use "mobile" style as the default style, <a href="https://github.com/cnshsliu/menu.demo/blob/main/src/routes/%2Blayout.svelte">explore source code here</a>
 
 # Menu logo and personal avatar
 
@@ -226,6 +236,8 @@ are given to &lt;Menu&gt; as "logo" and "avatar"
 avatar={{ img: 'https://.../avatar.png' }}
 logo={{ img: 'https://.../yn.png' }}
 ```
+
+If you already give the demo a try, you should already know where avatar and logo are used.
 
 # Binding Menu componet
 
@@ -238,28 +250,27 @@ let theMenu;
 />
 ```
 
+Binding component to a variable makes it easier to handle menu dynamically later, just read following sections, if you will use a simple static menu which will not be changed, then no need to play around menu binding.
+
 # Change menuitems on fly
 
-```
+Change menuitems defintion, passed it to refreshMenu.
 
+```
 let menuDef = [...];
-
 theMenu.refreshMenu(menuDef);
-
 ```
 
-# Menuitems visiblilty
+# Control the visiblilty of a specific menu item:
 
 Method 1: set "visible" value directly
 
 ```
-
 menuDef[index].visible = false;
 theMenu.tickMenu();
-
 ```
 
-Method 2: control with a function
+Method 2: control visibility with a function
 
 first, define a function in "+layout.svelte" where the &lt;Menu&gt; componet is placed in. This function return true/false to control whether a menu item should be visible or not. Like this example:
 
@@ -298,15 +309,17 @@ then, have "check_visible" specidifed like below for menu items which visbility 
 
 ```
 
-The "fn: checkValue" is the function name we defined previously, the "what" and "expect" will be passed to "checkValue" function.
+The "fn: checkValue" is the function name we defined previously, the "what" and "expect" will be passed to it.
 
-Finally, if $menuInSession is changed, tick the Menu.
+Finally, give "fn: checkValue" a chance to run by calling tickMenu().
+
+In the demo, we make it run when the value of $menuInSession is changed.
 
 ```
     $: $menuInSession + theMenu?.tickMenu();
 ```
 
-On the Menu beging ticked, svelte-menu will re-run "check_visible", thus, call "fn: checkValue" function, then show or hide correspoding menu items depend on the return value of "fn: checkValue".
+Once the Menu beging ticked, svelte-menu will re-run "check_visible", thus, call "fn: checkValue" function, then show or hide correspoding menu items depend on the return value of "fn: checkValue".
 
 In the demo, $menuInSession stores a true value on user being logged in, a false value on logging out, thus, when user is logged in, "Signin" is hdden while "Signout" is shown, and vice versa
 
