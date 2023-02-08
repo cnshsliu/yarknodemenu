@@ -232,7 +232,7 @@
 		if (isMobile) {
 			menuStyle = 'mobile';
 		} else {
-			menuStyle = 'pc';
+			menuStyle = 'browser';
 		}
 
 		if (menuStyle === 'mobile') mainAreaClass = '';
