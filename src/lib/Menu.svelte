@@ -253,7 +253,6 @@
 		} else {
 			if (item.check_visible) {
 				ret = item.check_visible.fn(item.check_visible.what, item.check_visible.expect);
-				console.log(item.alias, 3, ret, item.check_visible);
 			}
 		}
 
@@ -262,7 +261,6 @@
 
 	const refreshMenu = (newMenuDef: menuDataType[] | undefined = undefined) => {
 		if (newMenuDef) menuDef = newMenuDef;
-		console.log('In refresh menu 2', menuDef);
 		switch (dataMode) {
 			case 'static':
 				break;
@@ -282,7 +280,6 @@
 			});
 		}
 		menuItems = menuItems;
-		console.log('In refresh menu 2', menuItems);
 	};
 
 	export const tickMenu = () => {
@@ -292,7 +289,6 @@
 	onMount(async () => {
 		menuMode = menuStyle === 'mobile' || menuStyle === 'windows' ? 'float-logo' : 'float-small';
 		lastMenuMode = menuStyle === 'mobile' || menuStyle === 'windows' ? 'float-big' : 'float-small';
-		console.log('onMount: ', menuStyle, menuMode, lastMenuMode);
 
 		refreshMenu();
 		dispatch('menuMounted');
