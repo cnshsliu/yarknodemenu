@@ -4,6 +4,8 @@ A full-featured sveltekit menu component.
 
 Demo site: <a href="https://menu-demo-lyart.vercel.app/">https://menu-demo-lyart.vercel.app/</a>
 
+Try the demo first, then read on please.
+
 # Usage
 
 ## install package
