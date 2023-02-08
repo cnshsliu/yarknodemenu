@@ -1,3 +1,3 @@
 // Reexport your entry components here
-import YarkNodeMenu from './YarkNodeMenu.svelte';
-export default YarkNodeMenu;
+import Menu from '$lib/Menu.svelte';
+export default Menu;
