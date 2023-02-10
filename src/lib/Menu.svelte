@@ -425,7 +425,7 @@
 			</div>
 		{/if}
 		{#if menuMode !== 'float-logo'}
-			<div>
+			<div class="pb-2">
 				{#each menuItems as item}
 					{#if checkVisible(item)}
 						<div
@@ -476,9 +476,11 @@
 						</div>
 					{/if}
 				{/each}
-				<div>
-					<hr class="m-0 p-0 mt-2" />
-				</div>
+				{#if ['mobile', 'windows'].indexOf(menuStyle) >= 0}
+					<div>
+						<hr class="m-0 p-0 mt-2" />
+					</div>
+				{/if}
 			</div>
 		{/if}
 		{#if dataMode !== 'editting'}

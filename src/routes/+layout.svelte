@@ -186,7 +186,7 @@
 		{
 			id: '____demostye',
 			alias: 'Menu Style',
-			icon: 'flower',
+			icon: 'flower1',
 			sub: [
 				{
 					id: '__ds_browser',
