@@ -429,7 +429,13 @@
 				{#each menuItems as item}
 					{#if checkVisible(item)}
 						<div
-							class={dataMode === 'editting' ? 'menuitem-editting' : 'menuitem'}
+							class={dataMode === 'editting'
+								? 'menuitem-editting'
+								: 'menuitem ' + item.class
+								? Array.isArray(item.class)
+									? item.class.join(' ')
+									: item.class
+								: ''}
 							style={menuMode === 'float-small' && dataMode !== 'editting'
 								? 'margin-left: 8px;'
 								: `margin-left: ${8 + (item.level ?? 0) * 16}px;`}

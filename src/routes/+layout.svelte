@@ -59,7 +59,7 @@
 	const menuDef: menuDataType[] = [
 		{
 			id: '_worklist',
-			class: 'part1',
+			class: ['part1', 'lucas'],
 			alias: 'Worklist',
 			//on click, it will goto this href and expand sub
 			href: '/work',
