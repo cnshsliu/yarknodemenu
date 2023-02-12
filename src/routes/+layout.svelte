@@ -257,6 +257,7 @@
 	bind:this={theMenu}
 	{menuDef}
 	{menuStyle}
+	pinned={true}
 	avatar={{ img: '/avatar.png' }}
 	logo={{ img: '/yn.png' }}
 	on:changeWorklistStatus={onChangeWorklistStatus}

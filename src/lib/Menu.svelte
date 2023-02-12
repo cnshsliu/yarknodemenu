@@ -9,7 +9,6 @@
 		menuInSession,
 		menuDataForSetting,
 		menuConfig,
-		menuPinned,
 		menuRefreshFlag
 	} from '$lib/MenuData';
 	import type { menuItemType, menuDataType } from '$lib/MenuData';
@@ -32,14 +31,18 @@
 			$menuRefreshFlag = false;
 		})();
 
-	let menuMode: string = menuStyle === 'mobile' ? 'float-logo' : 'float-small';
+	let overflag: Record<string, boolean> = {};
+	export let pinned = true;
+	let lastPath = '';
+
+	let menuMode: string = pinned
+		? 'float-big'
+		: menuStyle === 'mobile'
+		? 'float-logo'
+		: 'float-small';
 	let lastMenuMode: string = menuStyle === 'mobile' ? 'float-big' : 'float-small';
 
 	if (['mobile', 'pc', 'browser', 'windows'].indexOf(menuStyle) < 0) menuStyle = 'browser';
-
-	let overflag: Record<string, boolean> = {};
-	let pinned = false;
-	let lastPath = '';
 
 	let foldersExpanding: any = {};
 	let menuItems: menuItemType[] = [];
@@ -144,7 +147,6 @@
 			dispatch('sizeChanged', { from: lastMenuMode, to: menuMode });
 		}
 		pinned = !pinned;
-		$menuPinned = pinned;
 	};
 	const onClickItem = (e: Event, item: menuItemType) => {
 		if (dataMode === 'editting') return;
@@ -287,7 +289,11 @@
 	};
 
 	onMount(async () => {
-		menuMode = menuStyle === 'mobile' || menuStyle === 'windows' ? 'float-logo' : 'float-small';
+		menuMode = pinned
+			? 'float-big'
+			: menuStyle === 'mobile' || menuStyle === 'windows'
+			? 'float-logo'
+			: 'float-small';
 		lastMenuMode = menuStyle === 'mobile' || menuStyle === 'windows' ? 'float-big' : 'float-small';
 
 		refreshMenu();
