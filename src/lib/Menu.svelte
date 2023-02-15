@@ -263,7 +263,7 @@
 
 	export const __refreshMenu = (newMenuDef: menuDataType[] | undefined = undefined) => {
 		if (newMenuDef) menuDef = newMenuDef;
-    if(dataMode === "editting")
+		if (dataMode === 'editting') {
 			menuDef = $menuDataForSetting as menuDataType[];
 		}
 		menuItems.length = 0;
