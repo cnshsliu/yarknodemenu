@@ -27,7 +27,7 @@
 	//Once menuRefreshFlag was set to true, refresh menu with data in $menuDataForSet;
 	$: $menuRefreshFlag &&
 		(() => {
-			refreshMenu($menuDataForSet);
+			__refreshMenu($menuDataForSet);
 			$menuRefreshFlag = false;
 		})();
 
@@ -261,14 +261,10 @@
 		return ret;
 	};
 
-	const refreshMenu = (newMenuDef: menuDataType[] | undefined = undefined) => {
+	export const __refreshMenu = (newMenuDef: menuDataType[] | undefined = undefined) => {
 		if (newMenuDef) menuDef = newMenuDef;
-		switch (dataMode) {
-			case 'static':
-				break;
-			case 'editting':
-				menuDef = $menuDataForSetting as menuDataType[];
-				break;
+    if(dataMode === "editting")
+			menuDef = $menuDataForSetting as menuDataType[];
 		}
 		menuItems.length = 0;
 		parseDataToItems(menuItems, menuDef, 0, '/');
@@ -296,7 +292,7 @@
 			: 'float-small';
 		lastMenuMode = menuStyle === 'mobile' || menuStyle === 'windows' ? 'float-big' : 'float-small';
 
-		refreshMenu();
+		__refreshMenu();
 		dispatch('menuMounted');
 	});
 
