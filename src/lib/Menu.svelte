@@ -305,7 +305,6 @@
 
 <a href={'#'} id="___ykmenu_hidden_a" style={'display: none;'}>&nbsp;</a>
 <!-- svelte-ignore missing-declaration -->
-{menuSize}
 {#if menuStyle === 'pc'}
 	<PcMenu {menuItems} {logo} {avatar} on:changeStyle on:changeWorklistStatus />
 {:else}
