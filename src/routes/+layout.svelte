@@ -257,6 +257,7 @@
 	bind:this={theMenu}
 	{menuDef}
 	{menuStyle}
+	defaultMenuSize={'float-logo'}
 	pinned={true}
 	avatar={{ img: '/avatar.png' }}
 	logo={{ img: '/yn.png' }}

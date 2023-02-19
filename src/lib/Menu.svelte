@@ -32,14 +32,11 @@
 		})();
 
 	let overflag: Record<string, boolean> = {};
-	export let pinned = true;
+	export let defaultMenuSize: string | undefined = undefined;
+	export let pinned: boolean = true;
 	let lastPath = '';
 
-	let menuMode: string = pinned
-		? 'float-big'
-		: menuStyle === 'mobile'
-		? 'float-logo'
-		: 'float-small';
+	let menuSize: string = 'float-small';
 	let lastMenuMode: string = menuStyle === 'mobile' ? 'float-big' : 'float-small';
 
 	if (['mobile', 'pc', 'browser', 'windows'].indexOf(menuStyle) < 0) menuStyle = 'browser';
@@ -108,31 +105,31 @@
 
 	const onMouseOver = () => {
 		if (dataMode === 'editting') return;
-		if (menuMode === 'float-small') {
-			menuMode = 'float-big';
+		if (menuSize === 'float-small') {
+			menuSize = 'float-big';
 			dispatch('sizeChanged', { from: 'float-small', to: 'float-big' });
 		}
 	};
 	const onMouseOut = () => {
 		if (dataMode === 'editting') return;
-		if (menuMode === 'float-big' && !pinned) {
+		if (menuSize === 'float-big' && !pinned) {
 			if (menuStyle === 'pc' || menuStyle === 'browser') {
-				menuMode = 'float-small';
+				menuSize = 'float-small';
 				dispatch('sizeChanged', { from: 'float-big', to: 'float-small' });
 			} else {
-				menuMode = 'float-logo';
+				menuSize = 'float-logo';
 				dispatch('sizeChanged', { from: 'float-big', to: 'float-logo' });
 			}
 		}
 	};
 	const onClickLogo = () => {
-		if (menuMode === 'float-logo') {
-			menuMode = menuStyle === 'mobile' || menuStyle === 'windows' ? lastMenuMode : 'float-big';
-			dispatch('sizeChanged', { from: 'float-logo', to: menuMode });
+		if (menuSize === 'float-logo') {
+			menuSize = menuStyle === 'mobile' || menuStyle === 'windows' ? lastMenuMode : 'float-big';
+			dispatch('sizeChanged', { from: 'float-logo', to: menuSize });
 		} else {
-			lastMenuMode = menuMode;
-			menuMode = 'float-logo';
-			dispatch('sizeChanged', { from: lastMenuMode, to: menuMode });
+			lastMenuMode = menuSize;
+			menuSize = 'float-logo';
+			dispatch('sizeChanged', { from: lastMenuMode, to: menuSize });
 		}
 	};
 	const onBlur = () => {};
@@ -140,11 +137,11 @@
 	const onTogglePin = (e: Event) => {
 		e.preventDefault();
 		if (pinned) {
-			//menuMode =menuStyle === 'mobile' || menuStyle === 'windows' ? 'float-logo' : 'float-small';
+			//menuSize =menuStyle === 'mobile' || menuStyle === 'windows' ? 'float-logo' : 'float-small';
 		} else {
-			lastMenuMode = menuMode;
-			menuMode = 'float-big';
-			dispatch('sizeChanged', { from: lastMenuMode, to: menuMode });
+			lastMenuMode = menuSize;
+			menuSize = 'float-big';
+			dispatch('sizeChanged', { from: lastMenuMode, to: menuSize });
 		}
 		pinned = !pinned;
 	};
@@ -175,7 +172,7 @@
 			}
 		} else {
 			if (menuStyle === 'mobile' || menuStyle === 'windows') {
-				menuMode = 'float-logo';
+				menuSize = 'float-logo';
 			}
 		}
 		if (item.callback) {
@@ -285,7 +282,11 @@
 	};
 
 	onMount(async () => {
-		menuMode = pinned
+		menuSize = defaultMenuSize
+			? menuStyle === 'mobile' || menuStyle === 'windows'
+				? 'float-logo'
+				: defaultMenuSize
+			: pinned
 			? 'float-big'
 			: menuStyle === 'mobile' || menuStyle === 'windows'
 			? 'float-logo'
@@ -297,13 +298,14 @@
 	});
 
 	$: menuStyle &&
-		(menuMode = menuStyle === 'mobile' || menuStyle === 'windows' ? 'float-logo' : 'float-small') &&
+		(menuSize = menuStyle === 'mobile' || menuStyle === 'windows' ? 'float-logo' : 'float-small') &&
 		(lastMenuMode =
 			menuStyle === 'mobile' || menuStyle === 'windows' ? 'float-big' : 'float-small');
 </script>
 
 <a href={'#'} id="___ykmenu_hidden_a" style={'display: none;'}>&nbsp;</a>
 <!-- svelte-ignore missing-declaration -->
+{menuSize}
 {#if menuStyle === 'pc'}
 	<PcMenu {menuItems} {logo} {avatar} on:changeStyle on:changeWorklistStatus />
 {:else}
@@ -313,7 +315,7 @@
 			'kfk-menu-style-' +
 			menuStyle +
 			' ' +
-			(dataMode === 'editting' ? 'editting-menu' : 'kfk-menu-' + menuMode + ' tnt-navmenu')}
+			(dataMode === 'editting' ? 'editting-menu' : 'kfk-menu-' + menuSize + ' tnt-navmenu')}
 		on:mouseenter={onMouseOver}
 		on:mouseleave={onMouseOut}
 		on:blur={onBlur}
@@ -340,7 +342,7 @@
 						&nbsp;
 					</div>
 				{/if}
-				{#if menuMode !== 'float-logo' && menuMode !== 'float-small'}
+				{#if menuSize !== 'float-logo' && menuSize !== 'float-small'}
 					<div
 						class={(menuStyle === 'mobile' || menuStyle === 'windows' ? '' : 'ms-auto') +
 							' hstack  gap-2'}
@@ -426,7 +428,7 @@
 				{/if}
 			</div>
 		{/if}
-		{#if menuMode !== 'float-logo'}
+		{#if menuSize !== 'float-logo'}
 			<div class="pb-2">
 				{#each menuItems as item}
 					{#if checkVisible(item)}
@@ -439,7 +441,7 @@
 											? item.class.join(' ')
 											: item.class
 										: '')}
-							style={menuMode === 'float-small' && dataMode !== 'editting'
+							style={menuSize === 'float-small' && dataMode !== 'editting'
 								? 'margin-left: 8px;'
 								: `margin-left: ${8 + (item.level ?? 0) * 16}px;`}
 							on:keydown={null}
@@ -463,7 +465,7 @@
 									{/if}
 									<!--end 显示图标 -->
 									<!--start 显示文字 -->
-									{#if dataMode !== 'editting' && menuMode === 'float-small'}
+									{#if dataMode !== 'editting' && menuSize === 'float-small'}
 										<!-- 窄屏方式且没有icon,显示第一个字符 -->
 										{#if !(item.icon || item.img)}
 											<div class="w-100 text-center">
@@ -476,7 +478,7 @@
 									{/if}
 									<!--end 显示文字 -->
 								</div>
-								{#if menuMode === 'float-big' && item.hasSub}
+								{#if menuSize === 'float-big' && item.hasSub}
 									<div class="col-auto m-0 ms-5 p-0">
 										<i class={'bi ' + (item.expanded ? 'bi-chevron-up' : 'bi-chevron-right')} />
 									</div>
