@@ -15,10 +15,13 @@
 	} from '$lib/MenuData';
 	import type { menuItemType, menuDataType } from '$lib/MenuData';
 
+	//普通用户侧显示模式，或编辑模式
 	export let dataMode: string = 'static';
+	//传入的菜单项定义
 	export let menuDef: menuDataType[] = [{ id: 'Welcome' }];
 	export let avatar: any = { img: 'unknown' };
 	export let logo: any = { img: '/yarknode_logo.png' };
+	//menuStyle: 四种菜单显示方式之一： pc, browser, mobile, windows
 	export let menuStyle: string = 'browser';
 
 	const dispatch = createEventDispatcher();
@@ -38,6 +41,10 @@
 	export let pinned: boolean = true;
 	let lastPath = '';
 
+	//菜单显示形式：
+	// float-logo: 仅显示logo
+	// flaot-small：收缩显示
+	// float-big： 展开显示
 	let menuSize: string = 'float-small';
 	let lastMenuMode: string = menuStyle === 'mobile' ? 'float-big' : 'float-small';
 
