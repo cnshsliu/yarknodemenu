@@ -328,7 +328,7 @@
 		on:mouseleave={onMouseOut}
 		on:blur={onBlur}
 		on:focus={onFocus}
-		transition:slide|local={{ delay: 100, duration: 300, easing: quintOut }}
+		transition:slide={{ delay: 100, duration: 300, easing: quintOut }}
 	>
 		{#if dataMode !== 'editting'}
 			<div class="hstack  gap-2">
@@ -453,7 +453,7 @@
 							style={menuSize === 'float-small' && dataMode !== 'editting'
 								? 'margin-left: 8px;'
 								: `margin-left: ${8 + (item.level ?? 0) * 16}px;`}
-							transition:slide|local={{ delay: 100, duration: 300, easing: quintOut }}
+							transition:slide={{ delay: 100, duration: 300, easing: quintOut }}
 							on:keydown={null}
 							on:click={(e) => {
 								onClickItem(e, item);
